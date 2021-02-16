@@ -30,10 +30,12 @@ jobs:
           image_name=$DOCKER_IMAGE_NAME-$suffix
 
           if [[ $suffix == "master" ]]; then
-            echo ON MASTER!!!!
+            echo ON MASTER!!!
           fi
 
           echo SUFFIX $suffix
+
+          echo IMAGE $image_name
 
           echo GITHUB_EVENT_NAME $GITHUB_EVENT_NAME
 
