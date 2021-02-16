@@ -17,8 +17,36 @@ jobs:
     steps:
       - name: Main
         shell: bash
+        env:
+          DOCKER_IMAGE_NAME: "rchain/rnode"
         run: |
-          echo main
+          if [[ $GITHUB_EVENT_NAME == "push" ]]; then
+            echo PUSH
+            git_ref=${GITHUB_REF#refs/*/}
+
+            if [[ $git_ref == "trying" ]]; then
+              suffix="try-$GITHUB_RUN_NUMBER"
+            elif [[ $git_ref == "staging" ]]; then
+              suffix="v1.2.3"
+            fi
+          fi
+
+          if [[ ! -z "${suffix// }" ]]; then
+            echo SUFFIX not empty
+
+            image_name=$DOCKER_IMAGE_NAME:$suffix
+
+            echo IMAGE $image_name
+
+            echo ---------------------
+          fi
+
+          echo SUFFIX $suffix
+          echo GITHUB_REF $GITHUB_REF
+          echo GITHUB_RUN_NUMBER $GITHUB_RUN_NUMBER
+          echo GITHUB_EVENT_NAME $GITHUB_EVENT_NAME
+          echo HEAD $GITHUB_HEAD_REF
+          echo BASE $GITHUB_BASE_REF
 
   release_docker_image:
     name: Release Docker Image
@@ -34,35 +62,6 @@ jobs:
         run: |
           echo Docker release !!
 
-          if [[ $GITHUB_EVENT_NAME == "push" ]]; then
-            echo PUSH
-            git_ref=${GITHUB_REF#refs/*/}
-
-            if [[ $git_ref == "trying" ]]; then
-              suffix="try-$GITHUB_RUN_NUMBER"
-            elif [[ $git_ref == "staging" ]]; then
-              suffix="v1.2.3"
-            fi
-          fi
-
-          image_name=$DOCKER_IMAGE_NAME:$suffix
-
-          echo IMAGE $image_name
-
-          echo ---------------------
-
-          echo GITHUB_RUN_NUMBER $GITHUB_RUN_NUMBER
-
-          echo GITHUB_REF $GITHUB_REF
-
-          echo SUFFIX $suffix
-
-          echo GITHUB_EVENT_NAME $GITHUB_EVENT_NAME
-
-          echo HEAD $GITHUB_HEAD_REF
-
-          echo BASE $GITHUB_BASE_REF
-
   bors_success:
     name: bors build finished
     needs:
@@ -74,5 +73,3 @@ jobs:
         shell: bash
         run: |
           echo BORS FINISHED !!!!
-
-          false
