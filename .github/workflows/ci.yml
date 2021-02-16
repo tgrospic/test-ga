@@ -2,8 +2,7 @@ name: CI
 on:
   push:
     branches:
-      - staging
-      - trying
+      - master
     tags: '**'
   pull_request:
     branches:
@@ -22,7 +21,13 @@ jobs:
       - name: Publish Docker Image
         shell: bash
         run: |
-          echo Publish docker !!!!
+          image_name=$DOCKER_IMAGE_NAME
+
+          if [[ $GITHUB_REF == refs/heads/* ]]; then
+              image_name+=-staging
+          fi
+
+          echo Publish docker image: $image_name
 
   bors_success:
     name: bors build finished
