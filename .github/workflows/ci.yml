@@ -33,10 +33,10 @@ jobs:
           image_name=$DOCKER_IMAGE_NAME
 
           if [[ $GITHUB_REF == refs/heads/* ]]; then
-              image_name+=-staging
+              image_name+=-$GITHUB_REF
           fi
 
-          echo Publish docker image: $image_name
+          echo Publish docker image: $image_name -- $GITHUB_REF
 
   bors_success:
     name: bors build finished
