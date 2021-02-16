@@ -19,10 +19,12 @@ jobs:
         env:
           DOCKER_IMAGE_NAME: "rchain/rnode"
         run: |
-          suffix=${GITHUB_REF#refs/*/}
-
-          if [[ $suffix == "master" ]]; then
-            echo ON MASTER!!!!
+          if [[ $GITHUB_EVENT_NAME == "push" ]]; then
+            echo PUSH
+            suffix=${GITHUB_REF#refs/*/}
+          elif [[ $GITHUB_EVENT_NAME == "pull_request" ]]
+            echo PULL_REQUEST
+            suffix=${GITHUB_REF#refs/pull//*}
           fi
 
           image_name=$DOCKER_IMAGE_NAME-$suffix
