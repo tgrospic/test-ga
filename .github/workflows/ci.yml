@@ -6,8 +6,7 @@ on:
     tags: '**'
   pull_request:
     branches:
-      - dev
-      - 'feature/**'
+      - master
 
 jobs:
 
@@ -30,13 +29,18 @@ jobs:
       - name: Publish Docker Image
         shell: bash
         run: |
-          image_name=$DOCKER_IMAGE_NAME
+          suffix=${GITHUB_REF#refs/*/}
+          image_name=$DOCKER_IMAGE_NAME-$suffix
 
-          if [[ $GITHUB_REF == refs/heads/* ]]; then
-              image_name+=-$GITHUB_REF
+          if [[ $suffix == "master" ]]; then
+            echo ON MASTER!!!!!
           fi
 
           echo TAG/BRANCH : ${GITHUB_REF#refs/heads/}, ${GITHUB_REF#refs/*/}
+
+          echo HEAD $GITHUB_HEAD_REF
+
+          echo BASE $GITHUB_BASE_REF
 
   bors_success:
     name: bors build finished
