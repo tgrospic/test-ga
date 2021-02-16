@@ -20,6 +20,20 @@ jobs:
         env:
           DOCKER_IMAGE_NAME: "rchain/rnode"
         run: |
+          echo main
+
+  release_docker_image:
+    name: Release Docker Image
+    needs:
+      - main
+    if: "github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/trying')"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Publish Docker Image
+        shell: bash
+        run: |
+          echo Docker release !!
+
           if [[ $GITHUB_EVENT_NAME == "push" ]]; then
             echo PUSH
             git_ref=${GITHUB_REF#refs/*/}
@@ -48,18 +62,6 @@ jobs:
           echo HEAD $GITHUB_HEAD_REF
 
           echo BASE $GITHUB_BASE_REF
-
-  release_docker_image:
-    name: Release Docker Image
-    needs:
-      - main
-    if: "github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/trying')"
-    runs-on: ubuntu-latest
-    steps:
-      - name: Publish Docker Image
-        shell: bash
-        run: |
-          echo Docker release !!
 
   bors_success:
     name: bors build finished
