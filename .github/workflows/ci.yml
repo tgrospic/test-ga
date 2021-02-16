@@ -17,18 +17,6 @@ jobs:
       - name: Main
         shell: bash
         run: |
-          echo MAIN
-
-  release_docker_image:
-    name: Release Docker Image
-    needs:
-      - main
-    if: "github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/master')"
-    runs-on: ubuntu-latest
-    steps:
-      - name: Publish Docker Image
-        shell: bash
-        run: |
           suffix=${GITHUB_REF#refs/*/}
           image_name=$DOCKER_IMAGE_NAME-$suffix
 
@@ -41,6 +29,18 @@ jobs:
           echo HEAD $GITHUB_HEAD_REF
 
           echo BASE $GITHUB_BASE_REF
+
+  release_docker_image:
+    name: Release Docker Image
+    needs:
+      - main
+    if: "github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/master')"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Publish Docker Image
+        shell: bash
+        run: |
+          echo Docker release !!
 
   bors_success:
     name: bors build finished
