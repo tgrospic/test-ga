@@ -17,7 +17,7 @@ jobs:
       - name: Main
         shell: bash
         env:
-          DOCKER_IMAGE_NAME: rchain/rnode
+          DOCKER_IMAGE_NAME: "rchain/rnode"
         run: |
           suffix=${GITHUB_REF#refs/*/}
           image_name=$DOCKER_IMAGE_NAME-$suffix
