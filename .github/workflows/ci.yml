@@ -27,7 +27,7 @@ jobs:
 
             PR_REGEX="^refs/pull/([[:digit:]])/."
             if [[ "$GITHUB_REF" =~ $PR_REGEX ]]; then
-              suffix="${BASH_REMATCH[1]}"
+              suffix="pr-${BASH_REMATCH[1]}"
             fi
           fi
 
