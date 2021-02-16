@@ -30,6 +30,8 @@ jobs:
 
           echo BASE $GITHUB_BASE_REF
 
+          echo RUN_ID $GITHUB_RUN_ID
+
   release_docker_image:
     name: Release Docker Image
     needs:
