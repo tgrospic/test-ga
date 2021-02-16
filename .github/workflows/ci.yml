@@ -36,7 +36,7 @@ jobs:
               image_name+=-$GITHUB_REF
           fi
 
-          echo Publish docker image: $image_name -- $GITHUB_REF
+          echo TAG/BRANCH : ${GITHUB_REF#refs/tags/}, ${GITHUB_REF#refs/*/}
 
   bors_success:
     name: bors build finished
