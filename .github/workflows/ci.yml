@@ -24,7 +24,11 @@ jobs:
             suffix=${GITHUB_REF#refs/*/}
           elif [[ $GITHUB_EVENT_NAME == "pull_request" ]]; then
             echo PULL_REQUEST
-            suffix=${GITHUB_REF#refs/pull//*}
+
+            PR_REGEX="^refs/pull/([[:digit:]])/."
+            if [[ "$GITHUB_REF" =~ $PR_REGEX ]]; then
+              suffix="${BASH_REMATCH[1]}"
+            fi
           fi
 
           image_name=$DOCKER_IMAGE_NAME-$suffix
@@ -32,6 +36,10 @@ jobs:
           if [[ $suffix == "master" ]]; then
             echo ON MASTER!!!
           fi
+
+          echo RUN_ID $GITHUB_RUN_ID
+
+          echo GITHUB_REF $GITHUB_REF
 
           echo SUFFIX $suffix
 
@@ -42,8 +50,6 @@ jobs:
           echo HEAD $GITHUB_HEAD_REF
 
           echo BASE $GITHUB_BASE_REF
-
-          echo RUN_ID $GITHUB_RUN_ID
 
   release_docker_image:
     name: Release Docker Image
