@@ -22,7 +22,7 @@ jobs:
           if [[ $GITHUB_EVENT_NAME == "push" ]]; then
             echo PUSH
             suffix=${GITHUB_REF#refs/*/}
-          elif [[ $GITHUB_EVENT_NAME == "pull_request" ]]
+          elif [[ $GITHUB_EVENT_NAME == "pull_request" ]]; then
             echo PULL_REQUEST
             suffix=${GITHUB_REF#refs/pull//*}
           fi
