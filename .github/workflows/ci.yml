@@ -38,7 +38,7 @@ jobs:
             echo ON MASTER!!!
           fi
 
-          echo RUN_ID $GITHUB_RUN_ID
+          echo GITHUB_RUN_NUMBER $GITHUB_RUN_NUMBER
 
           echo GITHUB_REF $GITHUB_REF
 
