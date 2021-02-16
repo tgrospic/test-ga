@@ -17,8 +17,6 @@ jobs:
     steps:
       - name: Main
         shell: bash
-        env:
-          DOCKER_IMAGE_NAME: "rchain/rnode"
         run: |
           echo main
 
@@ -31,6 +29,8 @@ jobs:
     steps:
       - name: Publish Docker Image
         shell: bash
+        env:
+          DOCKER_IMAGE_NAME: "rchain/rnode"
         run: |
           echo Docker release !!
 
