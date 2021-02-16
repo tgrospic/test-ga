@@ -53,6 +53,10 @@ jobs:
         run: |
           echo Docker release !!
 
+          echo HEAD $GITHUB_HEAD_REF
+
+          echo BASE $GITHUB_BASE_REF
+
   bors_success:
     name: bors build finished
     needs:
