@@ -37,9 +37,9 @@ jobs:
             image_name=$DOCKER_IMAGE_NAME:$suffix
 
             echo IMAGE $image_name
-
-            echo ---------------------
           fi
+
+          echo ---------------------
 
           echo SUFFIX $suffix
           echo GITHUB_REF $GITHUB_REF
