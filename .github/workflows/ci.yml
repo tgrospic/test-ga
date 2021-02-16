@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - master
+      - trying
     tags: '**'
   pull_request:
     branches:
