@@ -22,29 +22,26 @@ jobs:
         run: |
           if [[ $GITHUB_EVENT_NAME == "push" ]]; then
             echo PUSH
-            suffix=${GITHUB_REF#refs/*/}
-          elif [[ $GITHUB_EVENT_NAME == "pull_request" ]]; then
-            echo PULL_REQUEST
+            git_ref=${GITHUB_REF#refs/*/}
 
-            PR_REGEX="^refs/pull/([[:digit:]])/."
-            if [[ "$GITHUB_REF" =~ $PR_REGEX ]]; then
-              suffix="pr-${BASH_REMATCH[1]}"
+            if [[ $git_ref == "trying" ]]; then
+              suffix="try-$GITHUB_RUN_NUMBER"
+            elif [[ $git_ref == "staging" ]]; then
+              suffix="v1.2.3"
             fi
           fi
 
-          image_name=$DOCKER_IMAGE_NAME-$suffix
+          image_name=$DOCKER_IMAGE_NAME:$suffix
 
-          if [[ $suffix == "master" ]]; then
-            echo ON MASTER!!!!
-          fi
+          echo IMAGE $image_name
+
+          echo ---------------------
 
           echo GITHUB_RUN_NUMBER $GITHUB_RUN_NUMBER
 
           echo GITHUB_REF $GITHUB_REF
 
           echo SUFFIX $suffix
-
-          echo IMAGE $image_name
 
           echo GITHUB_EVENT_NAME $GITHUB_EVENT_NAME
 
