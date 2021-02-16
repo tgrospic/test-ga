@@ -20,6 +20,11 @@ jobs:
           DOCKER_IMAGE_NAME: "rchain/rnode"
         run: |
           suffix=${GITHUB_REF#refs/*/}
+
+          if [[ $suffix == "master" ]]; then
+            echo ON MASTER!!!!
+          fi
+
           image_name=$DOCKER_IMAGE_NAME-$suffix
 
           if [[ $suffix == "master" ]]; then
@@ -28,7 +33,7 @@ jobs:
 
           echo SUFFIX $suffix
 
-          echo
+          echo GITHUB_EVENT_NAME $GITHUB_EVENT_NAME
 
           echo HEAD $GITHUB_HEAD_REF
 
