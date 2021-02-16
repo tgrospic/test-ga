@@ -36,7 +36,7 @@ jobs:
               image_name+=-$GITHUB_REF
           fi
 
-          echo TAG/BRANCH : ${GITHUB_REF#refs/tags/}, ${GITHUB_REF#refs/*/}
+          echo TAG/BRANCH : ${GITHUB_REF#refs/heads/}, ${GITHUB_REF#refs/*/}
 
   bors_success:
     name: bors build finished
