@@ -28,6 +28,8 @@ jobs:
               suffix="try-$GITHUB_RUN_NUMBER"
             elif [[ $git_ref == "staging" ]]; then
               suffix="v1.2.3"
+            else
+              suffix="$git_ref"
             fi
           fi
 
