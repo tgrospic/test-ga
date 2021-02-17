@@ -52,19 +52,25 @@ jobs:
 
           cat $GITHUB_ENV
 
-  main:
-    name: Main job
-    runs-on: ubuntu-latest
+  release_docker_image:
+    name: Release Docker Image
     needs:
       - base
+    #if: "github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/trying')"
+    runs-on: ubuntu-latest
     steps:
-      - name: Main step
+      - name: Publish Docker Image
         shell: bash
         env:
           DOCKER_IMAGE_NAME: "rchain/rnode"
           VERSION: ${{ needs.base.outputs.VERSION }}
           BRANCH: ${{ needs.base.outputs.BRANCH }}
         run: |
+          echo Docker release !!!
+
+          echo BRANCH ${{ needs.base.outputs.BRANCH }}
+          echo VERSION ${{ needs.base.outputs.VERSION }}
+
           suffix=""
           ci_run=""
 
@@ -93,24 +99,6 @@ jobs:
             echo docker tag coop.rchain/rnode:latest $img_latest
             echo docker push $img_latest
           fi
-
-  release_docker_image:
-    name: Release Docker Image
-    needs:
-      - main
-      - base
-    #if: "github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/trying')"
-    runs-on: ubuntu-latest
-    steps:
-      - name: Publish Docker Image
-        shell: bash
-        env:
-          DOCKER_IMAGE_NAME: "rchain/rnode"
-        run: |
-          echo Docker release !!!
-
-          echo BRANCH ${{ needs.base.outputs.BRANCH }}
-          echo VERSION ${{ needs.base.outputs.VERSION }}
 
   bors_success:
     name: bors build finished
