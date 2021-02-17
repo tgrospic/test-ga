@@ -44,6 +44,8 @@ jobs:
           echo VERSION $version
           echo BRANCH $branch
 
+          cat $GITHUB_ENV
+
   main:
     name: Main job
     runs-on: ubuntu-latest
