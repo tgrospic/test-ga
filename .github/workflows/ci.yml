@@ -24,7 +24,7 @@ jobs:
       - name: Clone Repository
         uses: actions/checkout@v1
       - name: Set output
-        shell: bash
+        # shell: bash
         run: |
           echo GITHUB_REF $GITHUB_REF
           echo GITHUB_RUN_NUMBER $GITHUB_RUN_NUMBER
@@ -60,7 +60,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Publish Docker Image
-        shell: bash
+        # shell: bash
         env:
           DOCKER_IMAGE_NAME: "rchain/rnode"
           VERSION: ${{ needs.base.outputs.VERSION }}
