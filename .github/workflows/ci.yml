@@ -28,7 +28,7 @@ jobs:
 
           # Find related HEAD branch
           if [[ $GITHUB_REF =~ ^refs/tags/ ]]; then
-            raw=$(git branch -r --contains ${{ github.ref }})
+            raw=$(git branch --contains ${{ github.ref }})
             branch=${raw/origin\/}
           elif [[ $GITHUB_REF =~ ^refs/heads/ ]]; then
             branch=${GITHUB_REF#refs/*/}
