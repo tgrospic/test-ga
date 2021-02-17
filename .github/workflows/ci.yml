@@ -58,7 +58,7 @@ jobs:
           echo docker push $img_version
 
           # Tag Docker image as latest if dev branch is tagged
-          if [[ $GITHUB_REF =~ ^refs/tags/ ]]; then
+          if [[ $GITHUB_REF =~ ^refs/tags/ ]] && [[ $branch =~ ^dev$ ]]; then
             echo docker tag coop.rchain/rnode:latest $img_latest
             echo docker push $img_latest
           fi
@@ -86,7 +86,7 @@ jobs:
         run: |
           echo Docker release !!
 
-          echo GIT_BRANCH ${{ env.GIT_BRANCH }}
+          echo GIT_BRANCH ${{ jobs.main.steps.Main.env.GIT_BRANCH }}
 
   bors_success:
     name: bors build finished
