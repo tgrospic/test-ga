@@ -79,7 +79,7 @@ jobs:
         run: |
           echo Docker release !!
 
-          echo BRANCH ${{ env.BRANCH }}
+          #echo BRANCH ${{ env.BRANCH }}
 
   bors_success:
     name: bors build finished
