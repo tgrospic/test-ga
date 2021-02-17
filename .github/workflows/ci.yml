@@ -106,7 +106,7 @@ jobs:
     name: bors build finished
     needs:
       - release_docker_image
-    if: "github.event_name == 'push' && (github.ref == 'refs/heads/trying') && success()"
+    if: "github.event_name == 'push' && (github.ref == 'refs/heads/trying' || github.ref == 'refs/heads/staging') && success()"
     runs-on: ubuntu-latest
     steps:
       - name: BORS execute
