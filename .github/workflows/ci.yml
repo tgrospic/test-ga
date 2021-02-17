@@ -108,6 +108,7 @@ jobs:
 
           echo main GIT_BRANCH ${{ needs.main.outputs.GIT_BRANCH }}
           echo base GIT_BRANCH ${{ needs.base.outputs.GIT_BRANCH }}
+          echo jobs base GIT_BRANCH ${{ jobs.base.outputs.GIT_BRANCH }}
 
   bors_success:
     name: bors build finished
