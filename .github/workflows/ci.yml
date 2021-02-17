@@ -30,6 +30,7 @@ jobs:
           raw=$(git branch -r --contains ${{ github.ref }})
           branch=${raw/origin\/}
           echo "BRANCH=$branch" >> $GITHUB_ENV
+          echo BRANCH $branch
 
           # CI run number if trying or merging
           if [[ $git_ref =~ ^(trying|staging)$ ]]; then
