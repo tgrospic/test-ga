@@ -15,13 +15,15 @@ jobs:
     name: main
     runs-on: ubuntu-latest
     steps:
+      - name: Clone Repository
+        uses: actions/checkout@v1
       - name: Main
         shell: bash
         env:
           DOCKER_IMAGE_NAME: "rchain/rnode"
         run: |
           git_ref=${GITHUB_REF#refs/*/}
-          version="v1.2.3"
+          version="`git describe --tags --always`"
           suffix=""
           ci_run=""
 
