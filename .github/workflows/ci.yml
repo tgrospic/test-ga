@@ -35,16 +35,16 @@ jobs:
           fi
 
           image_name="$DOCKER_IMAGE_NAME$suffix"
+          img_version="$image_name:$version$ci_run"
+          img_latest="$image_name:latest"
 
           # Push Docker image
-          set -x
-          img_version="$image_name:$version$ci_run"
+          #set -x
           echo docker tag coop.rchain/rnode:latest $img_version
           echo docker push $img_version
 
           # Tag Docker image as latest if dev branch is tagged
           if [[ $GITHUB_REF =~ ^refs/tags/ ]]; then
-            img_latest="$image_name:latest"
             echo docker tag coop.rchain/rnode:latest $img_latest
             echo docker push $img_latest
           fi
