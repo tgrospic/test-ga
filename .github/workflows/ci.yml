@@ -26,6 +26,13 @@ jobs:
       - name: Set output
         shell: bash
         run: |
+          echo GITHUB_REF $GITHUB_REF
+          echo GITHUB_RUN_NUMBER $GITHUB_RUN_NUMBER
+          echo GITHUB_EVENT_NAME $GITHUB_EVENT_NAME
+          echo HEAD $GITHUB_HEAD_REF
+          echo BASE $GITHUB_BASE_REF
+          echo ---------------------------------
+
           version="`git describe --tags --always`"
 
           # Find related HEAD branch
@@ -72,6 +79,8 @@ jobs:
           img_version="$image_name:$VERSION$ci_run"
           img_latest="$image_name:latest"
 
+          echo >>>> IMAGE $image_name
+
           # Push Docker image
           #set -x
           echo docker tag coop.rchain/rnode:latest $img_version
@@ -82,15 +91,6 @@ jobs:
             echo docker tag coop.rchain/rnode:latest $img_latest
             echo docker push $img_latest
           fi
-
-          echo ---------------------
-
-          echo IMAGE $image_name
-          echo GITHUB_REF $GITHUB_REF
-          echo GITHUB_RUN_NUMBER $GITHUB_RUN_NUMBER
-          echo GITHUB_EVENT_NAME $GITHUB_EVENT_NAME
-          echo HEAD $GITHUB_HEAD_REF
-          echo BASE $GITHUB_BASE_REF
 
   release_docker_image:
     name: Release Docker Image
