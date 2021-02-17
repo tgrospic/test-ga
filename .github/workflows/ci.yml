@@ -86,7 +86,7 @@ jobs:
         run: |
           echo Docker release !!
 
-          echo GIT_BRANCH ${{ jobs.main.env.GIT_BRANCH }}
+          echo GIT_BRANCH ${{ needs.main.env.GIT_BRANCH }}
 
   bors_success:
     name: bors build finished
