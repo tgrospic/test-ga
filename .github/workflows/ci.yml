@@ -16,6 +16,8 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       output1: "my output"
+      output2: ${{ env.branch }}
+      output3: ${{ env.GIT_BRANCH }}
     steps:
       - name: Clone Repository
         uses: actions/checkout@v1
@@ -91,7 +93,9 @@ jobs:
 
           echo GIT_BRANCH ${{ needs.main.steps.main.env.GIT_BRANCH }}
 
-          echo output.main ${{ needs.main.outputs.output1 }}
+          echo output1 ${{ needs.main.outputs.output1 }}
+          echo output2 ${{ needs.main.outputs.output2 }}
+          echo output3 ${{ needs.main.outputs.output3 }}
 
   bors_success:
     name: bors build finished
