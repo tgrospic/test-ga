@@ -79,7 +79,7 @@ jobs:
           img_version="$image_name:$VERSION$ci_run"
           img_latest="$image_name:latest"
 
-          echo >>>> IMAGE $image_name
+          echo ---- IMAGE $image_name
 
           # Push Docker image
           #set -x
