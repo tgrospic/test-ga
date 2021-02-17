@@ -20,30 +20,38 @@ jobs:
         env:
           DOCKER_IMAGE_NAME: "rchain/rnode"
         run: |
-          if [[ $GITHUB_EVENT_NAME == "push" ]]; then
-            echo PUSH
-            git_ref=${GITHUB_REF#refs/*/}
+          git_ref=${GITHUB_REF#refs/*/}
+          version="v1.2.3"
+          suffix=""
+          ci_run=""
 
-            if [[ $git_ref == "trying" ]]; then
-              suffix="try-$GITHUB_RUN_NUMBER"
-            elif [[ $git_ref == "staging" ]]; then
-              suffix="v1.2.3"
-            else
-              suffix="$git_ref"
+          # CI run number if trying or merging
+          if [[ $git_ref =~ ^(trying|staging)$ ]]; then
+            suffix="-$git_ref"
+
+            if [[ $git_ref =~ ^trying$ ]]; then
+              ci_run="-ci-$GITHUB_RUN_NUMBER"
             fi
           fi
 
-          if [[ ! -z "${suffix// }" ]]; then
-            echo SUFFIX not empty
+          image_name="$DOCKER_IMAGE_NAME$suffix"
 
-            image_name=$DOCKER_IMAGE_NAME:$suffix
+          # Push Docker image
+          set -x
+          img_version="$image_name:$version$ci_run"
+          echo docker tag coop.rchain/rnode:latest $img_version
+          echo docker push $img_version
 
-            echo IMAGE $image_name
+          # Tag Docker image as latest if dev branch is tagged
+          if [[ $GITHUB_REF =~ ^refs/tags/ ]]; then
+            img_latest="$image_name:latest"
+            echo docker tag coop.rchain/rnode:latest $img_latest
+            echo docker push $img_latest
           fi
 
           echo ---------------------
 
-          echo SUFFIX $suffix
+          echo IMAGE $image_name
           echo GITHUB_REF $GITHUB_REF
           echo GITHUB_RUN_NUMBER $GITHUB_RUN_NUMBER
           echo GITHUB_EVENT_NAME $GITHUB_EVENT_NAME
