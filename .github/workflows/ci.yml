@@ -94,6 +94,7 @@ jobs:
   release_docker_image:
     name: Release Docker Image
     needs:
+      - base
       - main
     #if: "github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/trying')"
     runs-on: ubuntu-latest
