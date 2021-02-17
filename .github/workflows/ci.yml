@@ -2,6 +2,7 @@ name: CI
 on:
   push:
     branches:
+      - dev
       - master
       - trying
       - staging
@@ -9,6 +10,7 @@ on:
   pull_request:
     branches:
       - master
+      - dev
 
 jobs:
 
