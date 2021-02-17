@@ -16,8 +16,8 @@ jobs:
     name: Base job
     runs-on: ubuntu-latest
     outputs:
-      GIT_BRANCH: ${{ env.GIT_BRANCH }}
       VERSION: ${{ env.VERSION }}
+      BRANCH: ${{ env.BRANCH }}
     steps:
       - name: Clone Repository
         uses: actions/checkout@v1
@@ -37,7 +37,7 @@ jobs:
           fi
 
           echo "VERSION=$version" >> $GITHUB_ENV
-          echo "GIT_BRANCH=$branch" >> $GITHUB_ENV
+          echo "BRANCH=$branch" >> $GITHUB_ENV
 
           echo VERSION $version
           echo BRANCH $branch
@@ -53,16 +53,16 @@ jobs:
         env:
           DOCKER_IMAGE_NAME: "rchain/rnode"
           VERSION: ${{ needs.base.outputs.VERSION }}
-          GIT_BRANCH: ${{ needs.base.outputs.GIT_BRANCH }}
+          BRANCH: ${{ needs.base.outputs.BRANCH }}
         run: |
           suffix=""
           ci_run=""
 
           # CI run number if trying or merging
-          if [[ $GIT_BRANCH =~ ^(trying|staging)$ ]]; then
-            suffix="-$GIT_BRANCH"
+          if [[ $BRANCH =~ ^(trying|staging)$ ]]; then
+            suffix="-$BRANCH"
 
-            if [[ $GIT_BRANCH =~ ^trying$ ]]; then
+            if [[ $BRANCH =~ ^trying$ ]]; then
               ci_run="-ci-$GITHUB_RUN_NUMBER"
             fi
           fi
@@ -94,8 +94,8 @@ jobs:
   release_docker_image:
     name: Release Docker Image
     needs:
-      - base
       - main
+      - base
     #if: "github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/trying')"
     runs-on: ubuntu-latest
     steps:
@@ -106,9 +106,8 @@ jobs:
         run: |
           echo Docker release !!
 
-          echo main GIT_BRANCH ${{ needs.main.outputs.GIT_BRANCH }}
-          echo base GIT_BRANCH ${{ needs.base.outputs.GIT_BRANCH }}
-          echo jobs base GIT_BRANCH ${{ jobs.base.outputs.GIT_BRANCH }}
+          echo BRANCH ${{ needs.base.outputs.BRANCH }}
+          echo VERSION ${{ needs.base.outputs.VERSION }}
 
   bors_success:
     name: bors build finished
