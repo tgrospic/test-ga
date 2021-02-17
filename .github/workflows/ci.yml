@@ -2,62 +2,121 @@ name: CI
 on:
   push:
     branches:
+      - dev
       - master
+      - trying
+      - staging
     tags: '**'
   pull_request:
     branches:
       - master
+      - dev
 
 jobs:
 
-  main:
-    name: main
+  base:
+    name: Base job
     runs-on: ubuntu-latest
+    outputs:
+      VERSION: ${{ env.VERSION }}
+      BRANCH: ${{ env.BRANCH }}
     steps:
-      - name: Main
+      - name: Clone Repository
+        uses: actions/checkout@v1
+      - name: Set output
+        shell: bash
+        run: |
+          echo GITHUB_REF $GITHUB_REF
+          echo GITHUB_RUN_NUMBER $GITHUB_RUN_NUMBER
+          echo GITHUB_EVENT_NAME $GITHUB_EVENT_NAME
+          echo HEAD $GITHUB_HEAD_REF
+          echo BASE $GITHUB_BASE_REF
+          echo ---------------------------------
+
+          version="`git describe --tags --always`"
+
+          # Find related HEAD branch
+          if [[ $GITHUB_REF =~ ^refs/tags/ ]]; then
+            raw=$(git branch -r --contains ${{ github.ref }})
+            if [[ $raw =~ ^origin/dev$ ]]; then
+              branch=${raw/origin\/}
+            fi
+          elif [[ $GITHUB_REF =~ ^refs/heads/ ]]; then
+            branch=${GITHUB_REF#refs/*/}
+          else
+            branch=$GITHUB_HEAD_REF
+          fi
+
+          echo "VERSION=$version" >> $GITHUB_ENV
+          echo "BRANCH=$branch" >> $GITHUB_ENV
+
+          cat $GITHUB_ENV
+
+  main:
+    name: Main job
+    runs-on: ubuntu-latest
+    needs:
+      - base
+    steps:
+      - name: Main step
         shell: bash
         env:
           DOCKER_IMAGE_NAME: "rchain/rnode"
+          VERSION: ${{ needs.base.outputs.VERSION }}
+          BRANCH: ${{ needs.base.outputs.BRANCH }}
         run: |
-          suffix=${GITHUB_REF#refs/*/}
+          suffix=""
+          ci_run=""
 
-          if [[ $suffix == "master" ]]; then
-            echo ON MASTER!!!!
+          # CI run number if trying or merging
+          if [[ $BRANCH =~ ^(trying|staging)$ ]]; then
+            suffix="-$BRANCH"
+
+            if [[ $BRANCH =~ ^trying$ ]]; then
+              ci_run="-ci-$GITHUB_RUN_NUMBER"
+            fi
           fi
 
-          image_name=$DOCKER_IMAGE_NAME-$suffix
+          image_name="$DOCKER_IMAGE_NAME$suffix"
+          img_version="$image_name:$VERSION$ci_run"
+          img_latest="$image_name:latest"
 
-          if [[ $suffix == "master" ]]; then
-            echo ON MASTER!!!!
+          echo ---- IMAGE $image_name
+
+          # Push Docker image
+          #set -x
+          echo docker tag coop.rchain/rnode:latest $img_version
+          echo docker push $img_version
+
+          # Tag Docker image as latest if dev branch is tagged
+          if [[ $GITHUB_REF =~ ^refs/tags/ ]] && [[ $BRANCH =~ ^dev$ ]]; then
+            echo docker tag coop.rchain/rnode:latest $img_latest
+            echo docker push $img_latest
           fi
-
-          echo SUFFIX $suffix
-
-          echo GITHUB_EVENT_NAME $GITHUB_EVENT_NAME
-
-          echo HEAD $GITHUB_HEAD_REF
-
-          echo BASE $GITHUB_BASE_REF
-
-          echo RUN_ID $GITHUB_RUN_ID
 
   release_docker_image:
     name: Release Docker Image
     needs:
       - main
-    if: "github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/master')"
+      - base
+    #if: "github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/trying')"
     runs-on: ubuntu-latest
     steps:
       - name: Publish Docker Image
         shell: bash
+        env:
+          DOCKER_IMAGE_NAME: "rchain/rnode"
         run: |
-          echo Docker release !!
+          echo Docker release !!!
+
+          echo BRANCH ${{ needs.base.outputs.BRANCH }}
+          echo VERSION ${{ needs.base.outputs.VERSION }}
 
   bors_success:
     name: bors build finished
     needs:
       - release_docker_image
-    if: "github.event_name == 'push' && (github.ref == 'refs/heads/master') && success()"
+    if: "github.event_name == 'push' && (github.ref == 'refs/heads/trying') && success()"
     runs-on: ubuntu-latest
     steps:
       - name: BORS execute
