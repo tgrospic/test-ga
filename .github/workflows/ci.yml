@@ -83,6 +83,8 @@ jobs:
             fi
           fi
 
+          set -x
+
           image_name="$DOCKER_IMAGE_NAME$suffix"
           img_version="$image_name:$VERSION$ci_run"
           img_latest="$image_name:latest"
@@ -90,7 +92,6 @@ jobs:
           echo ---- IMAGE $image_name
 
           # Push Docker image
-          #set -x
           echo docker tag coop.rchain/rnode:latest $img_version
           echo docker push $img_version
 
