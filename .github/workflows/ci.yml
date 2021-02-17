@@ -18,6 +18,7 @@ jobs:
       - name: Clone Repository
         uses: actions/checkout@v1
       - name: Main
+        id: main
         shell: bash
         env:
           DOCKER_IMAGE_NAME: "rchain/rnode"
@@ -76,7 +77,8 @@ jobs:
     name: Release Docker Image
     needs:
       - main
-    if: "github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/trying')"
+    #if: "github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/trying')"
+    if: "github.event_name == 'push'"
     runs-on: ubuntu-latest
     steps:
       - name: Publish Docker Image
@@ -86,7 +88,7 @@ jobs:
         run: |
           echo Docker release !!
 
-          echo GIT_BRANCH ${{ needs.main.env.GIT_BRANCH }}
+          echo GIT_BRANCH ${{ needs.main.steps.main.env.GIT_BRANCH }}
 
   bors_success:
     name: bors build finished
