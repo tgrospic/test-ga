@@ -38,7 +38,9 @@ jobs:
           # Find related HEAD branch
           if [[ $GITHUB_REF =~ ^refs/tags/ ]]; then
             raw=$(git branch -r --contains ${{ github.ref }})
-            branch=${raw/origin\/}
+            if [[ $raw =~ ^origin/dev$ ]]; then
+              branch=${raw/origin\/}
+            fi
           elif [[ $GITHUB_REF =~ ^refs/heads/ ]]; then
             branch=${GITHUB_REF#refs/*/}
           else
@@ -87,7 +89,7 @@ jobs:
           echo docker push $img_version
 
           # Tag Docker image as latest if dev branch is tagged
-          if [[ $GITHUB_REF =~ ^refs/tags/ ]] && [[ $branch =~ ^dev$ ]]; then
+          if [[ $GITHUB_REF =~ ^refs/tags/ ]] && [[ $BRANCH =~ ^dev$ ]]; then
             echo docker tag coop.rchain/rnode:latest $img_latest
             echo docker push $img_latest
           fi
