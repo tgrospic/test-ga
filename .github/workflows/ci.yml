@@ -15,14 +15,11 @@ jobs:
     name: main
     runs-on: ubuntu-latest
     outputs:
-      output1: "my output"
-      output2: ${{ env.branch }}
-      output3: ${{ env.GIT_BRANCH }}
+      GIT_BRANCH: ${{ env.GIT_BRANCH }}
     steps:
       - name: Clone Repository
         uses: actions/checkout@v1
       - name: Main
-        id: main
         shell: bash
         env:
           DOCKER_IMAGE_NAME: "rchain/rnode"
@@ -91,11 +88,7 @@ jobs:
         run: |
           echo Docker release !!
 
-          echo GIT_BRANCH ${{ needs.main.steps.main.env.GIT_BRANCH }}
-
-          echo output1 ${{ needs.main.outputs.output1 }}
-          echo output2 ${{ needs.main.outputs.output2 }}
-          echo output3 ${{ needs.main.outputs.output3 }}
+          echo GIT_BRANCH ${{ needs.main.outputs.GIT_BRANCH }}
 
   bors_success:
     name: bors build finished
