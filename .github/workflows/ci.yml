@@ -83,11 +83,10 @@ jobs:
         shell: bash
         env:
           DOCKER_IMAGE_NAME: "rchain/rnode"
-          BRANCH: ${{ jobs.main.env.GIT_BRANCH }}
         run: |
           echo Docker release !!
 
-          echo GIT_BRANCH ${{ env.BRANCH }}
+          echo GIT_BRANCH ${{ jobs.main.env.GIT_BRANCH }}
 
   bors_success:
     name: bors build finished
