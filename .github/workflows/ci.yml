@@ -105,7 +105,7 @@ jobs:
         env:
           DOCKER_IMAGE_NAME: "rchain/rnode"
         run: |
-          echo Docker release !!
+          echo Docker release !!!
 
           echo BRANCH ${{ needs.base.outputs.BRANCH }}
           echo VERSION ${{ needs.base.outputs.VERSION }}
