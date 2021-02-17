@@ -24,8 +24,9 @@ jobs:
       - name: Clone Repository
         uses: actions/checkout@v1
       - name: Set output
-        # shell: bash
         run: |
+          set -euo pipefail
+
           echo GITHUB_REF $GITHUB_REF
           echo GITHUB_RUN_NUMBER $GITHUB_RUN_NUMBER
           echo GITHUB_EVENT_NAME $GITHUB_EVENT_NAME
@@ -33,6 +34,7 @@ jobs:
           echo BASE $GITHUB_BASE_REF
           echo ---------------------------------
 
+          # Version from Git repository (tag-commit)
           version="`git describe --tags --always`"
           echo "VERSION=$version" >> $GITHUB_ENV
 
@@ -60,12 +62,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Publish Docker Image
-        # shell: bash
         env:
           DOCKER_IMAGE_NAME: "rchain/rnode"
           VERSION: ${{ needs.base.outputs.VERSION }}
           BRANCH: ${{ needs.base.outputs.BRANCH }}
         run: |
+          set -euo pipefail
+
           echo Docker release !!!
 
           echo BRANCH ${{ needs.base.outputs.BRANCH }}
@@ -109,4 +112,6 @@ jobs:
       - name: BORS execute
         shell: bash
         run: |
+          set -euo pipefail
+
           echo BORS FINISHED !!!!
