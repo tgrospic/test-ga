@@ -4,6 +4,7 @@ on:
     branches:
       - master
       - trying
+      - staging
     tags: '**'
   pull_request:
     branches:
@@ -17,28 +18,29 @@ jobs:
     outputs:
       GIT_BRANCH: ${{ env.GIT_BRANCH }}
       VERSION: ${{ env.VERSION }}
-    - name: Clone Repository
-      uses: actions/checkout@v1
-    - name: Set output
-      shell: bash
-      run: |
-        version="`git describe --tags --always`"
+    steps:
+      - name: Clone Repository
+        uses: actions/checkout@v1
+      - name: Set output
+        shell: bash
+        run: |
+          version="`git describe --tags --always`"
 
-        # Find related HEAD branch
-        if [[ $GITHUB_REF =~ ^refs/tags/ ]]; then
-          raw=$(git branch -r --contains ${{ github.ref }})
-          branch=${raw/origin\/}
-        elif [[ $GITHUB_REF =~ ^refs/heads/ ]]; then
-          branch=${GITHUB_REF#refs/*/}
-        else
-          branch=$GITHUB_HEAD_REF
-        fi
+          # Find related HEAD branch
+          if [[ $GITHUB_REF =~ ^refs/tags/ ]]; then
+            raw=$(git branch -r --contains ${{ github.ref }})
+            branch=${raw/origin\/}
+          elif [[ $GITHUB_REF =~ ^refs/heads/ ]]; then
+            branch=${GITHUB_REF#refs/*/}
+          else
+            branch=$GITHUB_HEAD_REF
+          fi
 
-        echo "VERSION=$version" >> $GITHUB_ENV
-        echo "GIT_BRANCH=$branch" >> $GITHUB_ENV
+          echo "VERSION=$version" >> $GITHUB_ENV
+          echo "GIT_BRANCH=$branch" >> $GITHUB_ENV
 
-        echo VERSION $version
-        echo BRANCH $branch
+          echo VERSION $version
+          echo BRANCH $branch
 
   main:
     name: Main job
