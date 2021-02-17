@@ -41,9 +41,6 @@ jobs:
           echo "VERSION=$version" >> $GITHUB_ENV
           echo "BRANCH=$branch" >> $GITHUB_ENV
 
-          echo VERSION $version
-          echo BRANCH $branch
-
           cat $GITHUB_ENV
 
   main:
