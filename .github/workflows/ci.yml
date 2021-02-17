@@ -83,7 +83,7 @@ jobs:
         shell: bash
         env:
           DOCKER_IMAGE_NAME: "rchain/rnode"
-          BRANCH: ${{ jobs.main.steps.Main.env.GIT_BRANCH }}
+          BRANCH: ${{ jobs.main.steps[Main].env.GIT_BRANCH }}
         run: |
           echo Docker release !!
 
