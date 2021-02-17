@@ -27,6 +27,10 @@ jobs:
           suffix=""
           ci_run=""
 
+          raw=$(git branch -r --contains ${{ github.ref }})
+          branch=${raw/origin\/}
+          echo "BRANCH=$branch" >> $GITHUB_ENV
+
           # CI run number if trying or merging
           if [[ $git_ref =~ ^(trying|staging)$ ]]; then
             suffix="-$git_ref"
@@ -73,6 +77,8 @@ jobs:
           DOCKER_IMAGE_NAME: "rchain/rnode"
         run: |
           echo Docker release !!
+
+          echo BRANCH ${{ env.BRANCH }}
 
   bors_success:
     name: bors build finished
