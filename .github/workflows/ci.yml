@@ -20,6 +20,7 @@ jobs:
     outputs:
       VERSION: ${{ env.VERSION }}
       BRANCH: ${{ env.BRANCH }}
+      DEV_LATEST_TAG: ${{ env.DEV_LATEST_TAG }}
     steps:
       - name: Clone Repository
         uses: actions/checkout@v1
@@ -37,6 +38,10 @@ jobs:
           # Version from Git repository (tag-commit)
           version="`git describe --tags --always`"
           echo "VERSION=$version" >> $GITHUB_ENV
+
+          # Find latest tag on dev branch
+          dev_latest_tag="`git describe --tags --abbrev=0 origin/dev`"
+          echo "DEV_LATEST_TAG=$dev_latest_tag" >> $GITHUB_ENV
 
           # Find related HEAD branch
           if [[ $GITHUB_REF =~ ^refs/tags/ ]]; then
@@ -66,13 +71,15 @@ jobs:
           DOCKER_IMAGE_NAME: "rchain/rnode"
           VERSION: ${{ needs.base.outputs.VERSION }}
           BRANCH: ${{ needs.base.outputs.BRANCH }}
+          DEV_LATEST_TAG: ${{ needs.base.outputs.DEV_LATEST_TAG }}
         run: |
           set -euo pipefail
 
           echo Docker release !!!
 
-          echo BRANCH ${{ needs.base.outputs.BRANCH }}
-          echo VERSION ${{ needs.base.outputs.VERSION }}
+          echo VERSION $VERSION
+          echo BRANCH $BRANCH
+          echo DEV_LATEST_TAG $DEV_LATEST_TAG
 
           suffix=""
           ci_run=""
@@ -96,8 +103,8 @@ jobs:
           echo docker tag coop.rchain/rnode:latest $img_version
           echo docker push $img_version
 
-          # Tag Docker image as latest if dev branch is tagged
-          if [[ $GITHUB_REF =~ ^refs/tags/ ]] && [[ $BRANCH =~ ^dev$ ]]; then
+          # Tag Docker image as latest if tag is the latest on dev branch
+          if [[ $GITHUB_REF =~ ^refs/tags/ ]] && [[ $DEV_LATEST_TAG =~ $VERSION ]]; then
             echo docker tag coop.rchain/rnode:latest $img_latest
             echo docker push $img_latest
           fi
