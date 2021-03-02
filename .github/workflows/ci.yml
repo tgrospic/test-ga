@@ -40,10 +40,11 @@ jobs:
           echo "VERSION=$version" >> $GITHUB_ENV
 
           # Find latest tag on dev branch
-          dev_latest_tag="`git describe --tags --abbrev=0 origin/dev`"
+          dev_latest_tag="`git describe --tags --abbrev=0 origin/master`"
           echo "DEV_LATEST_TAG=$dev_latest_tag" >> $GITHUB_ENV
 
           # Find related HEAD branch
+          branch=""
           if [[ $GITHUB_REF =~ ^refs/tags/ ]]; then
             # Tag related to multiple branches leaves empty branch variable
             raw_branch=$(git branch -r --contains ${{ github.ref }})
