@@ -2,124 +2,31 @@ name: CI
 on:
   push:
     branches:
-      - dev
       - master
-      - trying
-      - staging
-    tags: '**'
   pull_request:
     branches:
       - master
-      - dev
 
 jobs:
 
   base:
-    name: Base job
-    runs-on: ubuntu-latest
-    outputs:
-      VERSION: ${{ env.VERSION }}
-      BRANCH: ${{ env.BRANCH }}
-      DEV_LATEST_TAG: ${{ env.DEV_LATEST_TAG }}
-    steps:
-      - name: Clone Repository
-        uses: actions/checkout@v1
-      - name: Set output
-        run: |
-          set -euo pipefail
-
-          echo GITHUB_REF $GITHUB_REF
-          echo GITHUB_RUN_NUMBER $GITHUB_RUN_NUMBER
-          echo GITHUB_EVENT_NAME $GITHUB_EVENT_NAME
-          echo HEAD $GITHUB_HEAD_REF
-          echo BASE $GITHUB_BASE_REF
-          echo ---------------------------------
-
-          # Version from Git repository (tag-commit)
-          version="`git describe --tags --always`"
-          echo "VERSION=$version" >> $GITHUB_ENV
-
-          # Find latest tag on dev branch
-          dev_latest_tag="`git describe --tags --abbrev=0 origin/master`"
-          echo "DEV_LATEST_TAG=$dev_latest_tag" >> $GITHUB_ENV
-
-          # Find related HEAD branch
-          branch=""
-          if [[ $GITHUB_REF =~ ^refs/tags/ ]]; then
-            # Tag related to multiple branches leaves empty branch variable
-            raw_branch=$(git branch -r --contains ${{ github.ref }})
-            if [[ $raw_branch =~ ^[\ ]*origin/([^ ]*)$ ]]; then
-              branch="${BASH_REMATCH[1]}"
-            fi
-          elif [[ $GITHUB_REF =~ ^refs/heads/ ]]; then
-            branch=${GITHUB_REF#refs/*/}
-          else
-            branch=$GITHUB_HEAD_REF
-          fi
-          echo "BRANCH=$branch" >> $GITHUB_ENV
-
-          cat $GITHUB_ENV
-
-  release_docker_image:
-    name: Release Docker Image
-    needs:
-      - base
-    #if: "github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/trying')"
+    name: Check REV balances
     runs-on: ubuntu-latest
     steps:
-      - name: Publish Docker Image
-        env:
-          DOCKER_IMAGE_NAME: "rchain/rnode"
-          VERSION: ${{ needs.base.outputs.VERSION }}
-          BRANCH: ${{ needs.base.outputs.BRANCH }}
-          DEV_LATEST_TAG: ${{ needs.base.outputs.DEV_LATEST_TAG }}
-        run: |
-          set -euo pipefail
+    - name: Check out
+      uses: actions/checkout@v2
 
-          echo Docker release !!!
+    - name: Setup Node
+      uses: actions/setup-node@v1
+      with:
+        node-version: '16.x'
 
-          echo VERSION $VERSION
-          echo BRANCH $BRANCH
-          echo DEV_LATEST_TAG $DEV_LATEST_TAG
-
-          suffix=""
-          ci_run=""
-
-          # CI run number if trying or merging
-          if [[ $BRANCH =~ ^(trying|staging)$ ]]; then
-            suffix="-$BRANCH"
-
-            if [[ $BRANCH =~ ^trying$ ]]; then
-              ci_run="-ci-$GITHUB_RUN_NUMBER"
-            fi
-          fi
-
-          set -x
-
-          image_name="$DOCKER_IMAGE_NAME$suffix"
-          img_version="$image_name:$VERSION$ci_run"
-          img_latest="$image_name:latest"
-
-          # Push Docker image
-          echo docker tag coop.rchain/rnode:latest $img_version
-          echo docker push $img_version
-
-          # Tag Docker image as latest if tag is the latest on dev branch
-          if [[ $GITHUB_REF =~ ^refs/tags/ ]] && [[ $DEV_LATEST_TAG =~ $VERSION ]]; then
-            echo docker tag coop.rchain/rnode:latest $img_latest
-            echo docker push $img_latest
-          fi
-
-  bors_success:
-    name: bors build finished
-    needs:
-      - release_docker_image
-    if: "github.event_name == 'push' && (github.ref == 'refs/heads/trying' || github.ref == 'refs/heads/staging') && success()"
-    runs-on: ubuntu-latest
-    steps:
-      - name: BORS execute
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          echo BORS FINISHED !!!!
+    - name: Cache dependencies
+      uses: actions/cache@v1
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
+    - run: npm install
+    - run: node check-balances.mjs
