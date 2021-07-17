@@ -106,26 +106,23 @@ const C = { GREEN: "\x1b[0;32m", RED: "\x1b[0;31m", NC: "\x1b[0m" }
   console.log(`${C.GREEN}Validating ${addresses.length} REV balances.${C.NC}`)
 
   // Limit for results, pars and requests
-  const maxToProcess     = 100_000 // Hard Fork has 11,822 accounts
+  const maxToProcess     = 5_000 // Hard Fork has 11,822 accounts
   const balancePerDeploy = 25
   const parRequests      = 50
 
-  const addrChunks = R.pipe(
+  // Create deploys and requests in chunks
+  const promiseChunks = R.pipe(
     R.take(maxToProcess),
     R.splitEvery(balancePerDeploy),
+    R.map(getBalancesRho),
+    R.map(x => () => getRhoResult(walletsMap)(x)),
+    R.splitEvery(parRequests),
   )(addresses)
 
-  const termChunks = R.pipe(
-    R.map(getBalancesRho),
-  )(addrChunks)
-
-  const promiseRequests = termChunks.map(x => () => getRhoResult(walletsMap)(x))
-
-  const promiseChunks = R.splitEvery(parRequests, promiseRequests)
-
+  // Request results handler
   const resultChunksP = promiseChunks.map(requests => async () => {
     const resultChunks = await Promise.all(requests.map(f => f()))
-    const results = resultChunks.flat()
+    const results      = resultChunks.flat()
 
     results.forEach(([addr, rev, exportedRev, balanceOk]) => {
       if (balanceOk) {
@@ -138,6 +135,7 @@ const C = { GREEN: "\x1b[0;32m", RED: "\x1b[0;31m", NC: "\x1b[0m" }
     return results
   })
 
+  // Execute chunks in sequence with parallel requests
   const [resultChunks, totalCount] = await R.reduce(async (accP, p) => {
     const [acc, count] = await accP
     const results = await p()
@@ -148,6 +146,7 @@ const C = { GREEN: "\x1b[0;32m", RED: "\x1b[0;31m", NC: "\x1b[0m" }
 
   console.log(`Total balance checked: ${C.GREEN}${totalCount}${C.NC}`)
 
+  // Calculate failed validations
   const failed = resultChunks.flatMap(results => results.filter(([,,, ok]) => !ok))
 
   if (failed.length === 0) {
