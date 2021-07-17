@@ -1,8 +1,10 @@
 /// <reference path="./rnode-grpc-gen/js/rnode-grpc-js.d.ts" />
 import R from 'ramda'
 import fs from 'fs'
+import https from 'https'
 import { exit } from 'process'
 import grpc from '@grpc/grpc-js'
+import fetch from 'node-fetch'
 import { rnodeDeploy } from '@tgrospic/rnode-grpc-js'
 
 // Generated files with rnode-grpc-js tool
@@ -75,8 +77,18 @@ const getRhoResult = walletsMap => async function (rhoTerm) {
 const C = { GREEN: "\x1b[0;32m", RED: "\x1b[0;31m", NC: "\x1b[0m" }
 
 ;(async () => {
+  const snapshotUrl     = `https://raw.githubusercontent.com/rchain/rchain/dev/wallets_REV_BLOCK-908300.txt`
+  const walletsFileName = `wallets.txt`
+
+  if (!fs.existsSync(walletsFileName)) {
+    // Download wallets file / Final Snapshot
+    const body = await fetch(snapshotUrl).then(res => res.text())
+    // Write to a file
+    fs.writeFileSync(walletsFileName, body, 'utf8')
+  }
+
   // Load wallets file exported from main net block 908300
-  const walletsFile = fs.readFileSync('wallets.txt', 'utf8')
+  const walletsFile = fs.readFileSync(walletsFileName, 'utf8')
 
   const lineParser       = /^([1-9a-zA-Z]+),([0-9]+)/gm
   const tuplesImported   = walletsFile.matchAll(lineParser)
@@ -92,9 +104,10 @@ const C = { GREEN: "\x1b[0;32m", RED: "\x1b[0;31m", NC: "\x1b[0m" }
 
   console.log(`${C.GREEN}Validating ${addresses.length} REV balances.${C.NC}`)
 
-  const maxToProcess = 100
+  // Limit for results, pars and requests
+  const maxToProcess     = 5_000
   const balancePerDeploy = 25
-  const parRequests = 50
+  const parRequests      = 50
 
   const addrChunks = R.pipe(
     R.take(maxToProcess),

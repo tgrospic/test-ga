@@ -18,6 +18,7 @@
     "@tgrospic/rnode-grpc-js": "^0.8.5",
     "google-protobuf": "^3.17.3",
     "grpc-tools": "^1.11.2",
+    "node-fetch": "^2.6.1",
     "protobufjs": "^6.11.2",
     "ramda": "^0.27.1"
   },
