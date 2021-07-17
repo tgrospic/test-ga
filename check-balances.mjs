@@ -81,6 +81,7 @@ const C = { GREEN: "\x1b[0;32m", RED: "\x1b[0;31m", NC: "\x1b[0m" }
   const walletsFileName = `wallets.txt`
 
   if (!fs.existsSync(walletsFileName)) {
+    console.log(`Wallets.txt does not exists. Downloading ${C.GREEN}${snapshotUrl}...${C.NC}`)
     // Download wallets file / Final Snapshot
     const body = await fetch(snapshotUrl).then(res => res.text())
     // Write to a file
@@ -105,7 +106,7 @@ const C = { GREEN: "\x1b[0;32m", RED: "\x1b[0;31m", NC: "\x1b[0m" }
   console.log(`${C.GREEN}Validating ${addresses.length} REV balances.${C.NC}`)
 
   // Limit for results, pars and requests
-  const maxToProcess     = 5_000
+  const maxToProcess     = 100_000 // Hard Fork has 11,822 accounts
   const balancePerDeploy = 25
   const parRequests      = 50
 
