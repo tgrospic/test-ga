@@ -153,7 +153,7 @@ const C = { GREEN: "\x1b[0;32m", RED: "\x1b[0;31m", NC: "\x1b[0m" }
   if (failed.length === 0) {
     console.log(`${C.GREEN}REV balance validation completed succesfully!${C.NC}`)
   } else {
-    console.log(`${C.RED}Check failed with ${failed.length} account(s).${C.NC}`)
+    console.log(`${C.RED}Check failed for ${failed.length} account(s).${C.NC}`)
     exit(-1)
   }
 })()
